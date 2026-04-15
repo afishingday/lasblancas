@@ -40,6 +40,8 @@ export function buildDefaultUsers() {
       lot,
       password: `${lot}2026`,
       role: ADMIN_LOTS.has(lot) ? 'admin' : 'resident',
+      fincaName: '',
+      avatar: '',
     }
   })
 }
@@ -54,11 +56,15 @@ export const INITIAL_DATA = {
       lot: SUPERADMIN_LOT,
       password: `${SUPERADMIN_LOT}2026`,
       role: 'superadmin',
+      fincaName: '',
+      avatar: '',
     },
   ]),
+  settings: [],
   news: [],
   initiatives: [],
   funds: [],
+  events: [],
   services: [],
   community: [],
   mapLayers: [],
@@ -67,9 +73,11 @@ export const INITIAL_DATA = {
 
 export const EMPTY_DB = {
   users: [],
+  settings: [],
   news: [],
   initiatives: [],
   funds: [],
+  events: [],
   services: [],
   community: [],
   mapLayers: [],

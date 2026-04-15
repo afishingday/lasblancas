@@ -15,9 +15,11 @@ import { INITIAL_DATA, PORTAL_USERS_CONFIG_VERSION } from '../initialData.js'
 
 export const COLLECTION_NAMES = [
   'users',
+  'settings',
   'news',
   'initiatives',
   'funds',
+  'events',
   'services',
   'community',
   'mapLayers',
@@ -48,6 +50,14 @@ function sortRows(name, rows) {
       const nb = typeof b.id === 'number' ? b.id : Number(b.id) || 0
       return nb - na
     })
+  if (name === 'events')
+    return [...rows].sort((a, b) => {
+      const ta = Date.parse(a.startsAt) || 0
+      const tb = Date.parse(b.startsAt) || 0
+      return ta - tb
+    })
+  if (name === 'settings')
+    return [...rows].sort((a, b) => String(a.id).localeCompare(String(b.id)))
   return rows
 }
 
@@ -85,7 +95,7 @@ export function subscribePortalDb(setDb, onReady) {
 }
 
 /** Colecciones a vaciar (no incluye `users`). */
-const PURGE_COLLECTIONS = ['news', 'initiatives', 'funds', 'services', 'community', 'mapLayers', 'logs']
+const PURGE_COLLECTIONS = ['news', 'initiatives', 'funds', 'events', 'services', 'community', 'mapLayers', 'logs']
 
 /** Carpetas de Storage bajo las que suelen guardarse portadas (noticias, votaciones, proyectos). */
 const PURGE_STORAGE_ROOTS = ['news', 'initiatives', 'funds', 'maps']
@@ -191,6 +201,26 @@ export async function forceUserPlainPassword(lotNumber, newPassword) {
   await updateDoc(ref, { password: next })
 }
 
+/** Bloquea o desbloquea un usuario para impedirle iniciar sesión. */
+export async function setUserBlockedStatus(lotNumber, blocked) {
+  const ref = doc(db, 'users', lotNumber)
+  await updateDoc(ref, { blocked: Boolean(blocked) })
+}
+
+/** Actualiza campos de perfil del usuario (finca, avatar, etc.). */
+export async function updateUserProfile(lotNumber, partial) {
+  const ref = doc(db, 'users', lotNumber)
+  await setDoc(
+    ref,
+    stripForFirestore({
+      lot: lotNumber,
+      ...partial,
+      profileUpdatedAt: Date.now(),
+    }),
+    { merge: true },
+  )
+}
+
 export async function appendLog(entry) {
   const id = Date.now()
   await setDoc(doc(db, 'logs', String(id)), stripForFirestore({ ...entry, id }))
@@ -239,6 +269,47 @@ export async function addFund(fund) {
 
 export async function deleteFund(id) {
   await deleteDoc(doc(db, 'funds', String(id)))
+}
+
+export async function upsertPortalEvent(ev) {
+  await setDoc(doc(db, 'events', String(ev.id)), stripForFirestore(ev))
+}
+
+export async function deletePortalEvent(id) {
+  await deleteDoc(doc(db, 'events', String(id)))
+}
+
+const PUBLIC_SETTINGS_DOC_ID = 'public'
+
+const DEFAULT_PUBLIC_SETTINGS = {
+  id: PUBLIC_SETTINGS_DOC_ID,
+  workerName: 'Arley Franco',
+  workerPhone: '+57 315 4293038',
+  adminFeeCOP: 110000,
+  paymentAlias: '@davi3137884550',
+  paymentBankName: 'Banco Davivienda',
+  paymentAccountNumber: '488445444166',
+  paymentReceiptEmail: 'comunidadlasblancas@gmail.com',
+}
+
+/** Crea el documento de datos públicos del portal si no existe (trabajador, cuota, etc.). */
+export async function ensurePublicSettings() {
+  const ref = doc(db, 'settings', PUBLIC_SETTINGS_DOC_ID)
+  const snap = await getDoc(ref)
+  if (!snap.exists()) await setDoc(ref, stripForFirestore(DEFAULT_PUBLIC_SETTINGS))
+}
+
+export async function savePublicSettings(partial) {
+  const ref = doc(db, 'settings', PUBLIC_SETTINGS_DOC_ID)
+  await setDoc(
+    ref,
+    stripForFirestore({
+      id: PUBLIC_SETTINGS_DOC_ID,
+      updatedAt: Date.now(),
+      ...partial,
+    }),
+    { merge: true },
+  )
 }
 
 export async function upsertDirectoryRow(tableKey, row) {

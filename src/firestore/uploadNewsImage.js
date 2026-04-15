@@ -14,30 +14,47 @@ export const MAX_NEWS_IMAGE_BYTES = 600 * 1024
 /** Máximo de imágenes por noticia. */
 export const MAX_NEWS_IMAGES_COUNT = 5
 
-function newsImagesList(post) {
-  if (Array.isArray(post?.images) && post.images.length > 0) return post.images
-  if (post?.image) return [post.image]
+/** Imágenes propias de la noticia (sin logo placeholder ni URLs vacías). */
+export function newsOwnImagesList(post) {
+  const fromArr = Array.isArray(post?.images)
+    ? post.images.filter((u) => u && !isNewsFallbackImageUrl(u))
+    : []
+  if (fromArr.length > 0) return fromArr
+  if (post?.image && !isNewsFallbackImageUrl(post.image)) return [post.image]
   return []
 }
 
 /** Índice de la imagen de portada (0-based). Por defecto 0. */
 export function getNewsCoverIndex(post) {
-  const list = newsImagesList(post)
+  const list = newsOwnImagesList(post)
   if (list.length === 0) return 0
   const raw = Number(post?.coverIndex)
   const idx = Number.isFinite(raw) ? Math.floor(raw) : 0
   return Math.min(Math.max(0, idx), list.length - 1)
 }
 
-export function getNewsCoverUrl(post) {
-  const list = newsImagesList(post)
-  if (list.length === 0) return NEWS_FALLBACK_IMAGE
-  return list[getNewsCoverIndex(post)]
+/** Portada en el muro (Inicio): si no hay fotos propias, muestra el logo como vista previa solamente. */
+export function getNewsListPreviewCoverUrl(post) {
+  const own = newsOwnImagesList(post)
+  if (own.length === 0) return NEWS_FALLBACK_IMAGE
+  const idx = Math.min(Math.max(0, getNewsCoverIndex(post)), own.length - 1)
+  return own[idx]
 }
 
+/** Galería en detalle de noticia: solo URLs reales; sin logo automático. */
+export function getNewsDetailGalleryUrls(post) {
+  return [...newsOwnImagesList(post)]
+}
+
+/** @deprecated Usa getNewsListPreviewCoverUrl o getNewsDetailGalleryUrls */
+export function getNewsCoverUrl(post) {
+  return getNewsListPreviewCoverUrl(post)
+}
+
+/** @deprecated Usa getNewsDetailGalleryUrls en detalle y getNewsListPreviewCoverUrl en listas */
 export function getNewsGalleryUrls(post) {
-  const list = newsImagesList(post)
-  if (list.length > 0) return [...list]
+  const own = newsOwnImagesList(post)
+  if (own.length > 0) return [...own]
   return [NEWS_FALLBACK_IMAGE]
 }
 

@@ -135,6 +135,10 @@ const POLISH_KINDS = {
   fund_name: 'Mejora el nombre de este proyecto comunitario: breve y profesional.',
   fund_description:
     'Mejora la descripción de un proyecto de obra o gestión en un conjunto residencial en Colombia: 2–4 oraciones claras. No inventes cifras.',
+  event_title:
+    'Mejora el título de este evento comunitario en un conjunto residencial en Colombia: claro, respetuoso y concreto. Máximo 120 caracteres.',
+  event_notes:
+    'Mejora estas notas de evento para residentes: tono formal y cercano, con instrucciones claras y sin inventar datos.',
 }
 
 /**
@@ -170,13 +174,22 @@ export async function fetchGeminiSurveyOptions(question) {
   return { suggestedOptions: data.suggestedOptions }
 }
 
-/** Descripción de proyecto a partir del título. */
-export async function fetchGeminiProjectDescriptionFromTitle(title) {
+/**
+ * Descripción a partir del título (proyecto en fondos o propuesta en el muro).
+ * @param {string} title
+ * @param {{ mode?: 'project' | 'proposal' }} [options]
+ */
+export async function fetchGeminiProjectDescriptionFromTitle(title, options = {}) {
   if (!title?.trim()) return null
+  const mode = options.mode === 'proposal' ? 'proposal' : 'project'
+  const systemText =
+    mode === 'proposal'
+      ? 'Redacta en español una descripción breve de la propuesta vecinal para un conjunto residencial en Colombia: qué se busca, beneficio para la comunidad y tono respetuoso. No inventes montos ni fechas.'
+      : "Redacta en español una descripción breve del proyecto para el conjunto residencial 'Las Blancas'."
+  const label = mode === 'proposal' ? 'Título de la propuesta' : 'Título del proyecto'
   const { data, ok } = await generateJsonWithFallback({
-    systemText:
-      "Redacta en español una descripción breve del proyecto para el conjunto residencial 'Las Blancas'.",
-    userText: `Título del proyecto: "${title.trim()}"`,
+    systemText,
+    userText: `${label}: "${title.trim()}"`,
     jsonShapeHint:
       'Responde únicamente JSON: {"description":"2 o 3 oraciones formales, sin inventar montos ni fechas"}.',
   })
