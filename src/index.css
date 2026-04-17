@@ -7,3 +7,11 @@ body,
 #root {
   min-height: 100%;
 }
+
+/* Base un poco más cálida que gris puro (menos “clínica”, más acogedora). */
+@layer base {
+  body {
+    @apply antialiased text-stone-900;
+    background-color: #faf9f7;
+  }
+}

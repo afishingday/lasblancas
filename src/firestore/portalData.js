@@ -292,7 +292,7 @@ const DEFAULT_PUBLIC_SETTINGS = {
   paymentReceiptEmail: 'comunidadlasblancas@gmail.com',
 }
 
-/** Crea el documento de datos públicos del portal si no existe (trabajador, cuota, etc.). */
+/** Crea el documento de datos públicos del portal si no existe (trabajador, cuota, pagos, etc.). */
 export async function ensurePublicSettings() {
   const ref = doc(db, 'settings', PUBLIC_SETTINGS_DOC_ID)
   const snap = await getDoc(ref)

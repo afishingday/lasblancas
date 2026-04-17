@@ -1,13 +1,18 @@
 /**
  * Cliente Gemini (Google AI). Usa VITE_GEMINI_API_KEY.
- * Evita `responseSchema` (a veces falla según modelo/cuenta); pide JSON por instrucciones y varios modelos de respaldo.
- * Modelo principal alineado con cuadernomagico: gemini-2.5-flash (estable en v1beta). Reintentos con backoff ante 429/502/503.
+ * Misma idea que cuadernomagico/js/gemini.js: un solo modelo estable (v1beta), sin IDs -preview/fecha,
+ * y reintentos con backoff ante cualquier fallo de red o HTTP.
+ * @see C:\Users\usuario\Documents\Proyectos Personales Luis\cuadernomagico\js\gemini.js
  */
 
-const MODEL_FALLBACKS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
+/** Modelo fijo por defecto (igual que CuadernoMagico). */
+const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash'
 
-/** Pausas entre reintentos (ms), estilo cuadernomagico: backoff ante límites o errores transitorios. */
-const RETRY_DELAYS_MS = [1000, 2000, 4000, 8000]
+/** Pausas entre reintentos (ms): mismos escalones que cuadernomagico/js/gemini.js (delays). */
+const RETRY_DELAYS_MS = [1000, 2000, 4000, 8000, 16000]
+
+/** Intentos máximos por petición (cuadernomagico: while (retries < 5)). */
+const MAX_FETCH_ATTEMPTS = 5
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -23,8 +28,20 @@ function getApiKey() {
   return (import.meta.env.VITE_GEMINI_API_KEY || '').trim()
 }
 
-function getModelOverride() {
-  return (import.meta.env.VITE_GEMINI_MODEL || '').trim()
+function getModelId() {
+  let v = String(import.meta.env.VITE_GEMINI_MODEL || '')
+    .trim()
+    .replace(/^\uFEFF/, '')
+    .replace(/^['"]|['"]$/g, '')
+    .replace(/^models\//i, '')
+    .trim()
+  if (!v) return DEFAULT_GEMINI_MODEL
+  const lower = v.toLowerCase()
+  // Cualquier variante 1.5-pro suele fallar en v1beta (generateContent); no solo el id exacto.
+  if (lower.includes('gemini-1.5-pro') || lower.includes('-preview') || v.includes('@')) {
+    return DEFAULT_GEMINI_MODEL
+  }
+  return v
 }
 
 function parseJsonFromResponse(data) {
@@ -51,7 +68,7 @@ function parseJsonFromResponse(data) {
 }
 
 /**
- * @param {{ systemText: string, userText: string, jsonShapeHint: string }} opts
+ * @param {{ systemText: string, userText: string, jsonShapeHint: string, temperature?: number }} opts
  * @returns {Promise<{ data: any, ok: boolean }>}
  */
 async function generateJsonWithFallback(opts) {
@@ -62,61 +79,65 @@ async function generateJsonWithFallback(opts) {
     return { data: null, ok: false }
   }
 
-  const models = getModelOverride() ? [getModelOverride()] : MODEL_FALLBACKS
+  const model = getModelId()
   const fullUser = `${opts.systemText}\n\n${opts.userText}\n\n${opts.jsonShapeHint}`
+  const temperature =
+    typeof opts.temperature === 'number' && opts.temperature >= 0 && opts.temperature <= 2 ? opts.temperature : 0.35
 
+  // Misma forma que cuadernomagico fetchJSON: contents.parts (sin role), responseMimeType json.
   const body = {
-    contents: [{ role: 'user', parts: [{ text: fullUser }] }],
+    contents: [{ parts: [{ text: fullUser }] }],
     generationConfig: {
-      temperature: 0.35,
+      temperature,
       maxOutputTokens: 2048,
       responseMimeType: 'application/json',
     },
   }
 
-  for (const model of models) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
-    const maxAttempts = 1 + RETRY_DELAYS_MS.length
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      if (attempt > 0) await sleep(RETRY_DELAYS_MS[attempt - 1])
-      try {
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        })
-        const data = await res.json().catch(() => ({}))
-        if (!res.ok) {
-          const msg = data?.error?.message || `HTTP ${res.status}`
-          lastGeminiDetail = `${model}: ${msg}`
-          const modelMissing =
-            res.status === 404 || /not found|not supported|is not found/i.test(String(msg))
-          const retryable =
-            !modelMissing && [429, 500, 502, 503].includes(res.status)
-          if (retryable && attempt < maxAttempts - 1) {
-            console.warn('[Gemini] reintento', model, res.status)
-            continue
-          }
-          console.warn('[Gemini]', lastGeminiDetail)
-          break
-        }
-        const parsed = parseJsonFromResponse(data)
-        if (parsed) {
-          lastGeminiDetail = ''
-          return { data: parsed, ok: true }
-        }
-        lastGeminiDetail = `${model}: respuesta sin JSON válido`
-        console.warn('[Gemini]', lastGeminiDetail, data)
-        break
-      } catch (e) {
-        lastGeminiDetail = `${model}: ${e instanceof Error ? e.message : String(e)}`
-        if (attempt < maxAttempts - 1) {
-          console.warn('[Gemini] reintento tras error de red', model)
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`
+
+  for (let attempt = 0; attempt < MAX_FETCH_ATTEMPTS; attempt++) {
+    if (attempt > 0) {
+      const delayMs = RETRY_DELAYS_MS[Math.min(attempt - 1, RETRY_DELAYS_MS.length - 1)]
+      await sleep(delayMs)
+    }
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        const msg = data?.error?.message || `HTTP ${res.status}`
+        lastGeminiDetail = `${model}: ${msg}`
+        console.warn('[Gemini]', lastGeminiDetail)
+        if (attempt < MAX_FETCH_ATTEMPTS - 1) {
+          console.warn('[Gemini] reintento', attempt + 1, '/', MAX_FETCH_ATTEMPTS)
           continue
         }
-        console.warn('[Gemini] fetch', lastGeminiDetail)
-        break
+        return { data: null, ok: false }
       }
+      const parsed = parseJsonFromResponse(data)
+      if (parsed) {
+        lastGeminiDetail = ''
+        return { data: parsed, ok: true }
+      }
+      lastGeminiDetail = `${model}: respuesta sin JSON válido`
+      console.warn('[Gemini]', lastGeminiDetail, data)
+      if (attempt < MAX_FETCH_ATTEMPTS - 1) {
+        console.warn('[Gemini] reintento (parseo)', attempt + 1, '/', MAX_FETCH_ATTEMPTS)
+        continue
+      }
+      return { data: null, ok: false }
+    } catch (e) {
+      lastGeminiDetail = `${model}: ${e instanceof Error ? e.message : String(e)}`
+      console.warn('[Gemini] fetch', lastGeminiDetail)
+      if (attempt < MAX_FETCH_ATTEMPTS - 1) {
+        console.warn('[Gemini] reintento tras error de red', attempt + 1, '/', MAX_FETCH_ATTEMPTS)
+        continue
+      }
+      return { data: null, ok: false }
     }
   }
   return { data: null, ok: false }
@@ -139,6 +160,8 @@ const POLISH_KINDS = {
     'Mejora el título de este evento comunitario en un conjunto residencial en Colombia: claro, respetuoso y concreto. Máximo 120 caracteres.',
   event_notes:
     'Mejora estas notas de evento para residentes: tono formal y cercano, con instrucciones claras y sin inventar datos.',
+  directory_category:
+    'Corrige ortografía y estandariza este nombre de categoría para un directorio comunitario en Colombia. Devuelve un nombre corto (1 a 3 palabras), claro y consistente.',
 }
 
 /**
@@ -158,6 +181,29 @@ export async function polishSpanishField(kind, draft) {
   if (!ok || !data) return null
   const text = typeof data.text === 'string' ? data.text.trim() : ''
   return text || null
+}
+
+/**
+ * Una sola llamada para pulir título y/o descripción del muro de propuestas (más rápido y estable que dos polish).
+ * @param {{ title?: string, excerpt?: string }} draft
+ * @returns {Promise<{ title: string, excerpt: string } | null>}
+ */
+export async function polishProposalWallDraft(draft) {
+  const titleIn = String(draft?.title ?? '').trim()
+  const excerptIn = String(draft?.excerpt ?? '').trim()
+  if (!titleIn && !excerptIn) return null
+
+  const { data, ok } = await generateJsonWithFallback({
+    systemText:
+      'Eres editor para el muro de propuestas de un conjunto residencial en Colombia. Mejora ortografía y redacción sin cambiar el sentido ni inventar hechos, montos ni fechas.',
+    userText: `Título (puede estar vacío):\n"""${titleIn}"""\n\nDescripción breve (puede estar vacía):\n"""${excerptIn}"""`,
+    jsonShapeHint:
+      'Responde únicamente JSON con exactamente esta forma: {"title":"...","excerpt":"..."}. Reglas: si el título de entrada estaba vacío, devuelve title como "". Si la descripción de entrada estaba vacía, devuelve excerpt como "". Si había título, máximo 120 caracteres. Si había descripción, 2–4 frases cortas y claras. No pongas el título dentro de excerpt ni al revés.',
+  })
+  if (!ok || !data) return null
+  const title = typeof data.title === 'string' ? data.title.trim() : ''
+  const excerpt = typeof data.excerpt === 'string' ? data.excerpt.trim() : ''
+  return { title, excerpt }
 }
 
 /** Sugiere opciones de encuesta a partir de la pregunta. */
@@ -191,10 +237,55 @@ export async function fetchGeminiProjectDescriptionFromTitle(title, options = {}
     systemText,
     userText: `${label}: "${title.trim()}"`,
     jsonShapeHint:
-      'Responde únicamente JSON: {"description":"2 o 3 oraciones formales, sin inventar montos ni fechas"}.',
+      'Responde únicamente JSON con una sola clave de texto largo. Forma preferida: {"description":"2 o 3 oraciones formales, sin inventar montos ni fechas"}. Alternativas aceptables: {"text":"..."} o {"descripcion":"..."} (mismo contenido).',
   })
-  if (!ok || !data?.description) return null
-  return { description: String(data.description).trim() }
+  if (!ok || !data) return null
+  const raw =
+    data.description ??
+    data.descripcion ??
+    data.text ??
+    (typeof data.excerpt === 'string' ? data.excerpt : null)
+  const description = raw != null ? String(raw).trim() : ''
+  if (!description) return null
+  return { description }
+}
+
+/**
+ * Borrador de noticia cuando el proyecto alcanza la meta de recaudo (tono vecinal, agradecimiento, siguiente fase).
+ * @param {{ name?: string, goal?: number, raised?: number, description?: string }} fund
+ * @returns {Promise<{ title: string, excerpt: string, content: string } | null>}
+ */
+export async function fetchGeminiFundMetaReachedNews(fund) {
+  const name = String(fund?.name ?? '').trim()
+  if (!name) return null
+  const goal = Math.round(Number(fund?.goal) || 0)
+  const raised = Math.round(Number(fund?.raised) || 0)
+  const desc = String(fund?.description ?? '').trim().slice(0, 1200)
+
+  const { data, ok } = await generateJsonWithFallback({
+    temperature: 0.72,
+    systemText:
+      'Eres redactor/a para el portal vecinal del conjunto Las Blancas (Colombia). Las decisiones son comunitarias; no escribas como empresa ni uses la palabra administración. Tono cálido, claro y breve.',
+    userText: `Proyecto: "${name}".
+Meta de recaudo acordada (COP, entero): ${goal}.
+Recaudado registrado (COP, entero): ${raised}.
+Contexto del proyecto (puede estar vacío):\n"""${desc}"""
+
+La comunidad acaba de cumplir la meta de recaudo. Redacta una noticia para el muro de inicio.`,
+    jsonShapeHint:
+      'Responde SOLO JSON con esta forma exacta: {"title":"...","excerpt":"...","content":"..."}. ' +
+        'title: máximo 90 caracteres, festivo y claro (ej. agradecer, celebrar juntos). ' +
+        'excerpt: 1 o 2 frases, máximo 220 caracteres, con gratitud al compromiso de los vecinos y mención breve de que ya están listos para la siguiente fase o para comenzar (obra o gestión según encaje). ' +
+        'content: 2 a 4 párrafos cortos en español; mezcla con naturalidad: agradecimiento por el apoyo y el compromiso de los lotes, orgullo colectivo, que gracias a todos se alcanzó la meta, invitación a estar atentos a próximos pasos o avisos. ' +
+        'Incluye al menos una variación de estilo entre: "estamos listos para comenzar", "gracias por su apoyo", "gracias por el compromiso" (no las repitas todas seguidas ni como lista). ' +
+        'No inventes cifras distintas a meta y recaudado; no prometas fechas concretas.',
+  })
+  if (!ok || !data) return null
+  const title = typeof data.title === 'string' ? data.title.trim() : ''
+  const excerpt = typeof data.excerpt === 'string' ? data.excerpt.trim() : ''
+  const content = typeof data.content === 'string' ? data.content.trim() : ''
+  if (!title || !excerpt || !content) return null
+  return { title, excerpt, content }
 }
 
 /**
