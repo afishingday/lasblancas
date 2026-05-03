@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.robolaf.com)",
+      "Read(//c/Users/usuario/Documents/Proyectos Personales Luis/agora/**)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npx tailwindcss *)",
+      "Read(//c/Users/usuario/Documents/Proyectos Personales Luis/portalespaciodepesca/**)",
+      "Read(//c/Users/usuario/Documents/Proyectos Personales Luis/consejopadreslsyh/src/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\usuario\\Documents\\Proyectos Personales Luis\\agora",
+      "c:\\Users\\usuario\\Documents\\Proyectos Personales Luis\\consejopadreslsyh\\src\\shared"
+    ]
+  }
+}

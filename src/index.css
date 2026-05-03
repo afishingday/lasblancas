@@ -8,6 +8,20 @@ body,
   min-height: 100%;
 }
 
+html {
+  color-scheme: light;
+  /* Portal theme — colores primarios (bosque/esmeralda por defecto).
+     applyTheme() en App.jsx los sobreescribe en tiempo real según la elección del admin. */
+  --pt-50:  236 253 245;
+  --pt-100: 209 250 229;
+  --pt-200: 167 243 208;
+  --pt-500: 16 185 129;
+  --pt-600: 5 150 105;
+  --pt-700: 4 120 87;
+  --pt-800: 6 95 70;
+  --pt-900: 6 78 59;
+}
+
 /* Base un poco más cálida que gris puro (menos “clínica”, más acogedora). */
 @layer base {
   body {

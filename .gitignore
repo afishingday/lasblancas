@@ -15,6 +15,9 @@ dist
 dist-ssr
 *.local
 
+# Documentos legales / privados
+registro-dnda/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

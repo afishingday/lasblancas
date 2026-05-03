@@ -5,6 +5,8 @@
  * @see C:\Users\usuario\Documents\Proyectos Personales Luis\cuadernomagico\js\gemini.js
  */
 
+import { TENANT } from './tenant.config.js'
+
 /** Modelo fijo por defecto (igual que CuadernoMagico). */
 const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash'
 
@@ -231,7 +233,7 @@ export async function fetchGeminiProjectDescriptionFromTitle(title, options = {}
   const systemText =
     mode === 'proposal'
       ? 'Redacta en español una descripción breve de la propuesta vecinal para un conjunto residencial en Colombia: qué se busca, beneficio para la comunidad y tono respetuoso. No inventes montos ni fechas.'
-      : "Redacta en español una descripción breve del proyecto para el conjunto residencial 'Las Blancas'."
+      : `Redacta en español una descripción breve del proyecto para el conjunto residencial '${TENANT.name}'.`
   const label = mode === 'proposal' ? 'Título de la propuesta' : 'Título del proyecto'
   const { data, ok } = await generateJsonWithFallback({
     systemText,
@@ -265,7 +267,7 @@ export async function fetchGeminiFundMetaReachedNews(fund) {
   const { data, ok } = await generateJsonWithFallback({
     temperature: 0.72,
     systemText:
-      'Eres redactor/a para el portal vecinal del conjunto Las Blancas (Colombia). Las decisiones son comunitarias; no escribas como empresa ni uses la palabra administración. Tono cálido, claro y breve.',
+      `Eres redactor/a para el portal vecinal del conjunto ${TENANT.name} (Colombia). Las decisiones son comunitarias; no escribas como empresa ni uses la palabra administración. Tono cálido, claro y breve.`,
     userText: `Proyecto: "${name}".
 Meta de recaudo acordada (COP, entero): ${goal}.
 Recaudado registrado (COP, entero): ${raised}.
@@ -312,6 +314,39 @@ export async function fetchGeminiDirectoryPreferences(mode, userInstruction, dat
   const sortBy = ['name', 'lot', 'label'].includes(data.sortBy) ? data.sortBy : 'name'
   const filter = typeof data.filter === 'string' ? data.filter.trim() : ''
   return { sortBy, filter }
+}
+
+/**
+ * Verifica si una nueva propuesta/votación es semánticamente similar a alguna existente.
+ * @param {string} newTitle
+ * @param {string} newExcerpt
+ * @param {Array<{ title: string, excerpt: string }>} existingItems
+ * @returns {Promise<{ hasSimilar: boolean, similarTitles: string[] } | null>}
+ */
+export async function fetchGeminiDuplicateCheck(newTitle, newExcerpt, existingItems) {
+  if (!newTitle?.trim() || !existingItems?.length) return null
+
+  const summary = existingItems
+    .slice(0, 30)
+    .map(
+      (item, i) =>
+        `${i + 1}. "${String(item.title || '').trim()}"${item.excerpt ? ': ' + String(item.excerpt).trim().slice(0, 120) : ''}`,
+    )
+    .join('\n')
+
+  const { data, ok } = await generateJsonWithFallback({
+    temperature: 0.1,
+    systemText:
+      'Eres asistente para un portal comunitario en Colombia. Identifica si la nueva entrada es semánticamente similar (misma idea central, aunque con palabras distintas) a alguna de las existentes. Sé estricto: solo marca similitud si el tema central es realmente el mismo, no meras coincidencias de palabras genéricas.',
+    userText: `Nueva entrada:\nTítulo: "${newTitle.trim()}"\nDescripción: "${String(newExcerpt || '').trim().slice(0, 300)}"\n\nEntradas existentes:\n${summary}`,
+    jsonShapeHint:
+      'Responde solo JSON: {"hasSimilar":boolean,"similarTitles":string[]}. similarTitles: títulos exactos de las entradas similares encontradas (array vacío si ninguna).',
+  })
+  if (!ok || !data) return null
+  return {
+    hasSimilar: Boolean(data.hasSimilar),
+    similarTitles: Array.isArray(data.similarTitles) ? data.similarTitles.filter(Boolean) : [],
+  }
 }
 
 export function isGeminiConfigured() {

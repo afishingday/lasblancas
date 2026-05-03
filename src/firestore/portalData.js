@@ -4,14 +4,16 @@ import {
   doc,
   getDoc,
   getDocs,
+  increment,
   onSnapshot,
   setDoc,
   updateDoc,
   writeBatch,
 } from 'firebase/firestore'
-import { deleteObject, listAll, ref } from 'firebase/storage'
+import { deleteObject, getMetadata, listAll, ref } from 'firebase/storage'
 import { db, storage } from '../firebase.js'
 import { INITIAL_DATA, PORTAL_USERS_CONFIG_VERSION } from '../initialData.js'
+import { TENANT } from '../tenant.config.js'
 
 export const COLLECTION_NAMES = [
   'users',
@@ -24,6 +26,7 @@ export const COLLECTION_NAMES = [
   'community',
   'mapLayers',
   'logs',
+  'sharing',
 ]
 
 /** Quita undefined (Firestore no los acepta). */
@@ -38,11 +41,21 @@ function docToRow(d) {
     const n = Number(d.id)
     id = Number.isNaN(n) ? d.id : n
   }
-  return { ...data, id }
+  const row = { ...data, id }
+  // Los docs son `users/{lote}`; si falta el campo `lot` (datos legacy o merges), usar el id del documento.
+  if (d.ref.parent.id === 'users') {
+    const lotTrim = String(row.lot ?? '').trim()
+    if (!lotTrim) {
+      const n = Number(d.id)
+      const fallbackLot = Number.isNaN(n) ? String(d.id) : String(d.id)
+      return { ...row, lot: fallbackLot }
+    }
+  }
+  return row
 }
 
 function sortRows(name, rows) {
-  if (name === 'news')
+  if (name === 'news' || name === 'sharing')
     return [...rows].sort((a, b) => Number(b.id) - Number(a.id))
   if (name === 'logs')
     return [...rows].sort((a, b) => {
@@ -95,10 +108,10 @@ export function subscribePortalDb(setDb, onReady) {
 }
 
 /** Colecciones a vaciar (no incluye `users`). */
-const PURGE_COLLECTIONS = ['news', 'initiatives', 'funds', 'events', 'services', 'community', 'mapLayers', 'logs']
+const PURGE_COLLECTIONS = ['news', 'initiatives', 'funds', 'events', 'services', 'community', 'mapLayers', 'logs', 'sharing']
 
 /** Carpetas de Storage bajo las que suelen guardarse portadas (noticias, votaciones, proyectos). */
-const PURGE_STORAGE_ROOTS = ['news', 'initiatives', 'funds', 'maps']
+const PURGE_STORAGE_ROOTS = ['news', 'initiatives', 'funds', 'maps', 'sharing']
 
 async function deleteStorageFolderRecursive(folderPath) {
   const folderRef = ref(storage, folderPath)
@@ -152,25 +165,35 @@ export async function seedFirestoreIfEmpty() {
 }
 
 /**
- * Crea o actualiza todos los usuarios del padrón (merge) cuando cambia PORTAL_USERS_CONFIG_VERSION.
- * Usuarios ya existentes: solo actualiza `lot` y `role` (no toca `password`, para no revertir cambios de clave).
+ * Crea usuarios nuevos del padrón cuando cambia PORTAL_USERS_CONFIG_VERSION.
+ * Usuarios ya existentes en Firestore: no se tocan (password, role y demás datos se preservan).
  * Lotes nuevos en el padrón: documento completo con contraseña por defecto.
+ *
+ * El estado de sincronización se guarda en Firestore (`settings/__sync_meta__`) además del localStorage.
+ * Así, el sync real solo corre una vez por versión globalmente, sin importar cuántos navegadores abran el portal.
  */
 export async function syncUsersIfNeeded() {
   if (typeof localStorage === 'undefined') return
   if (localStorage.getItem('lb_portal_users_ver') === PORTAL_USERS_CONFIG_VERSION) return
+
+  // Si otro navegador ya hizo el sync de esta versión, solo actualizar el cache local y salir.
+  const syncMetaRef = doc(db, 'settings', '__sync_meta__')
+  const syncMeta = await getDoc(syncMetaRef)
+  if (syncMeta.exists() && syncMeta.data()?.usersVersion === PORTAL_USERS_CONFIG_VERSION) {
+    localStorage.setItem('lb_portal_users_ver', PORTAL_USERS_CONFIG_VERSION)
+    return
+  }
 
   const snap = await getDocs(collection(db, 'users'))
   const existingIds = new Set(snap.docs.map((d) => d.id))
 
   const batch = writeBatch(db)
   INITIAL_DATA.users.forEach((u) => {
-    if (existingIds.has(u.lot)) {
-      batch.set(doc(db, 'users', u.lot), stripForFirestore({ lot: u.lot, role: u.role }), { merge: true })
-    } else {
+    if (!existingIds.has(u.lot)) {
       batch.set(doc(db, 'users', u.lot), stripForFirestore(u))
     }
   })
+  batch.set(syncMetaRef, { usersVersion: PORTAL_USERS_CONFIG_VERSION }, { merge: true })
   await batch.commit()
   localStorage.setItem('lb_portal_users_ver', PORTAL_USERS_CONFIG_VERSION)
 }
@@ -238,12 +261,20 @@ export async function deleteNewsPost(id) {
   await deleteDoc(doc(db, 'news', String(id)))
 }
 
+export async function setNewsPostSuppressed(id, suppressed) {
+  await updateDoc(doc(db, 'news', String(id)), { adminSuppressed: Boolean(suppressed) })
+}
+
 export async function saveInitiative(init) {
   await setDoc(doc(db, 'initiatives', String(init.id)), stripForFirestore(init))
 }
 
 export async function deleteInitiative(id) {
   await deleteDoc(doc(db, 'initiatives', String(id)))
+}
+
+export async function setInitiativeSuppressed(id, suppressed) {
+  await updateDoc(doc(db, 'initiatives', String(id)), { adminSuppressed: Boolean(suppressed) })
 }
 
 export async function convertInitiativeToFund(initiative, newProject) {
@@ -283,13 +314,9 @@ const PUBLIC_SETTINGS_DOC_ID = 'public'
 
 const DEFAULT_PUBLIC_SETTINGS = {
   id: PUBLIC_SETTINGS_DOC_ID,
-  workerName: 'Arley Franco',
-  workerPhone: '+57 315 4293038',
-  adminFeeCOP: 110000,
-  paymentAlias: '@davi3137884550',
-  paymentBankName: 'Banco Davivienda',
-  paymentAccountNumber: '488445444166',
-  paymentReceiptEmail: 'comunidadlasblancas@gmail.com',
+  ...TENANT.defaults,
+  portalNavOrder: null,
+  portalNavHidden: [],
 }
 
 /** Crea el documento de datos públicos del portal si no existe (trabajador, cuota, pagos, etc.). */
@@ -328,4 +355,88 @@ export async function upsertMapLayer(layer) {
 
 export async function deleteMapLayer(id) {
   await deleteDoc(doc(db, 'mapLayers', String(id)))
+}
+
+export async function addSharingPost(post) {
+  await setDoc(doc(db, 'sharing', String(post.id)), stripForFirestore(post))
+}
+
+export async function updateSharingPost(post) {
+  await setDoc(doc(db, 'sharing', String(post.id)), stripForFirestore(post))
+}
+
+export async function deleteSharingPost(id) {
+  await deleteDoc(doc(db, 'sharing', String(id)))
+}
+
+const GUIDE_STATS_DOC = 'guideStats'
+const GUIDE_IDS = ['flora', 'peces', 'anfibios', 'mamiferos']
+
+function blankGuideStats() {
+  const obj = { id: GUIDE_STATS_DOC }
+  GUIDE_IDS.forEach((id) => { obj[id] = { views: 0, downloads: 0, reactions: {} } })
+  return obj
+}
+
+export async function recordGuideInteraction(guideId, field) {
+  const r = doc(db, 'settings', GUIDE_STATS_DOC)
+  try {
+    await updateDoc(r, { [`${guideId}.${field}`]: increment(1) })
+  } catch {
+    const init = blankGuideStats()
+    init[guideId][field] = 1
+    await setDoc(r, stripForFirestore(init))
+  }
+}
+
+export async function toggleGuideReaction(guideId, emoji, delta) {
+  const r = doc(db, 'settings', GUIDE_STATS_DOC)
+  try {
+    await updateDoc(r, { [`${guideId}.reactions.${emoji}`]: increment(delta) })
+  } catch {
+    if (delta <= 0) return
+    const init = blankGuideStats()
+    init[guideId].reactions[emoji] = 1
+    await setDoc(r, stripForFirestore(init))
+  }
+}
+
+const STORAGE_ROOTS = ['news', 'initiatives', 'funds', 'maps', 'sharing']
+
+async function listFilesRecursive(folderRef) {
+  const items = []
+  const list = await listAll(folderRef)
+  items.push(...list.items)
+  for (const prefix of list.prefixes) {
+    const nested = await listFilesRecursive(prefix)
+    items.push(...nested)
+  }
+  return items
+}
+
+export async function acceptTerms(userId, version) {
+  await updateDoc(doc(db, 'users', String(userId)), {
+    termsAcceptedVersion: version,
+    termsAcceptedAt: Date.now(),
+  })
+}
+
+export async function getStorageUsage() {
+  const byFolder = {}
+  let totalBytes = 0
+  let totalFiles = 0
+  for (const root of STORAGE_ROOTS) {
+    const items = await listFilesRecursive(ref(storage, root))
+    let folderBytes = 0
+    for (const item of items) {
+      try {
+        const meta = await getMetadata(item)
+        folderBytes += meta.size || 0
+      } catch {}
+    }
+    byFolder[root] = { bytes: folderBytes, count: items.length }
+    totalBytes += folderBytes
+    totalFiles += items.length
+  }
+  return { totalBytes, totalFiles, byFolder, checkedAt: Date.now() }
 }

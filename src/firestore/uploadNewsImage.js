@@ -1,6 +1,8 @@
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage'
 import { BRAND_LOGO_SRC } from '../brandAssets.js'
 import { storage } from '../firebase.js'
+import { compressImageFileIfNeeded } from '../shared/compressImageUnderMaxBytes.js'
+import { getYoutubeVideoIdFromNewsPost } from '../shared/utils.js'
 
 /** URL del logo empaquetada (válida en Firestore y en la app). `public/images/logo.png` sigue existiendo para enlaces absolutos si hace falta. */
 export const NEWS_FALLBACK_IMAGE = BRAND_LOGO_SRC
@@ -8,8 +10,11 @@ export const NEWS_FALLBACK_IMAGE = BRAND_LOGO_SRC
 /** Compatibilidad con código que aún use el nombre anterior. */
 export const DEFAULT_NEWS_IMAGE = NEWS_FALLBACK_IMAGE
 
-/** Máximo por archivo (600 KB). */
+/** Máximo por archivo ya procesado (600 KB). */
 export const MAX_NEWS_IMAGE_BYTES = 600 * 1024
+
+/** Tamaño máximo del archivo fuente que el usuario puede seleccionar (15 MB). */
+export const MAX_IMAGE_SOURCE_BYTES = 15 * 1024 * 1024
 
 /** Máximo de imágenes por noticia. */
 export const MAX_NEWS_IMAGES_COUNT = 5
@@ -33,12 +38,24 @@ export function getNewsCoverIndex(post) {
   return Math.min(Math.max(0, idx), list.length - 1)
 }
 
-/** Portada en el muro (Inicio): si no hay fotos propias, muestra el logo como vista previa solamente. */
+/** Miniatura de YouTube para tarjetas cuando la noticia no tiene fotos propias. */
+export function getYoutubeNewsPreviewThumbnailUrl(videoId) {
+  const id = String(videoId || '').trim()
+  if (!id) return null
+  return `https://i.ytimg.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`
+}
+
+/** Portada en el muro (Inicio): fotos propias; si no hay, miniatura del video de YouTube si aplica; si no, logo. */
 export function getNewsListPreviewCoverUrl(post) {
   const own = newsOwnImagesList(post)
-  if (own.length === 0) return NEWS_FALLBACK_IMAGE
-  const idx = Math.min(Math.max(0, getNewsCoverIndex(post)), own.length - 1)
-  return own[idx]
+  if (own.length > 0) {
+    const idx = Math.min(Math.max(0, getNewsCoverIndex(post)), own.length - 1)
+    return own[idx]
+  }
+  const ytId = getYoutubeVideoIdFromNewsPost(post)
+  const ytThumb = ytId ? getYoutubeNewsPreviewThumbnailUrl(ytId) : null
+  if (ytThumb) return ytThumb
+  return NEWS_FALLBACK_IMAGE
 }
 
 /** Galería en detalle de noticia: solo URLs reales; sin logo automático. */
@@ -65,14 +82,23 @@ export function isNewsFallbackImageUrl(url) {
 
 export async function uploadNewsImageFile(file, newsId, fileIndex = 0) {
   if (!(file instanceof File) || file.size === 0) throw new Error('NEWS_IMAGE_INVALID')
-  if (file.size > MAX_NEWS_IMAGE_BYTES) throw new Error('NEWS_IMAGE_TOO_LARGE')
-
-  const safeName = file.name.replace(/[^\w.\-]/g, '_').slice(0, 96) || 'cover.jpg'
+  const prepared = await compressImageFileIfNeeded(file, MAX_NEWS_IMAGE_BYTES)
+  const safeName = prepared.name.replace(/[^\w.\-]/g, '_').slice(0, 96) || 'cover.jpg'
   const path = `news/${newsId}/${Date.now()}_${fileIndex}_${safeName}`
   const storageRef = ref(storage, path)
-  await uploadBytes(storageRef, file, {
-    contentType: file.type || 'image/jpeg',
+  await uploadBytes(storageRef, prepared, {
+    contentType: prepared.type || 'image/jpeg',
   })
+  return getDownloadURL(storageRef)
+}
+
+export async function uploadSharingImageFile(file, postId, fileIndex = 0) {
+  if (!(file instanceof File) || file.size === 0) throw new Error('IMAGE_INVALID')
+  const prepared = await compressImageFileIfNeeded(file, MAX_NEWS_IMAGE_BYTES)
+  const safeName = prepared.name.replace(/[^\w.\-]/g, '_').slice(0, 96) || 'photo.jpg'
+  const path = `sharing/${postId}/${Date.now()}_${fileIndex}_${safeName}`
+  const storageRef = ref(storage, path)
+  await uploadBytes(storageRef, prepared, { contentType: prepared.type || 'image/jpeg' })
   return getDownloadURL(storageRef)
 }
 

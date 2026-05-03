@@ -1,0 +1,57 @@
+/**
+ * Estilos agnósticos del bloque de reacciones (variables CSS para otros temas).
+ * Contenedor: .portal-reactions
+ */
+.portal-reactions {
+  --rx-gap: 0.375rem;
+  --rx-radius: 0.5rem;
+  --rx-font-size: 0.75rem;
+  --rx-font-weight: 700;
+  --rx-inactive-bg: rgba(255, 255, 255, 0.85);
+  --rx-inactive-border: #e7e5e4;
+  --rx-inactive-text: #57534e;
+  --rx-inactive-hover-bg: rgba(236, 253, 245, 0.5);
+  --rx-inactive-hover-border: #a7f3d0;
+  --rx-active-bg: #ecfdf5;
+  --rx-active-border: #6ee7b7;
+  --rx-active-text: #065f46;
+  --rx-active-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rx-gap);
+}
+
+.portal-reactions__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--rx-radius);
+  font-size: var(--rx-font-size);
+  font-weight: var(--rx-font-weight);
+  border: 1px solid var(--rx-inactive-border);
+  background: var(--rx-inactive-bg);
+  color: var(--rx-inactive-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.portal-reactions__btn:hover {
+  border-color: var(--rx-inactive-hover-border);
+  background: var(--rx-inactive-hover-bg);
+}
+
+.portal-reactions__btn--active {
+  background: var(--rx-active-bg);
+  border-color: var(--rx-active-border);
+  color: var(--rx-active-text);
+  box-shadow: var(--rx-active-shadow);
+}
+
+.portal-reactions__count {
+  font-variant-numeric: tabular-nums;
+}

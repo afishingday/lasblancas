@@ -1,0 +1,371 @@
+LICENCIA DE USO DE SOFTWARE
+Portal Comunitario Las Blancas
+════════════════════════════════════════════════════════════════════════════════
+
+AVISO DE DERECHOS DE AUTOR Y CONDICIONES DE USO
+
+© 2025 Luis Fernando Montoya Mejia. Todos los derechos reservados.
+
+Este documento constituye el contrato de licencia de uso entre el titular de los
+derechos de autor del software descrito a continuación y el licenciatario
+autorizado. La instalación, despliegue, acceso o uso del software implica la
+aceptación íntegra de los términos aquí establecidos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 1. IDENTIFICACIÓN DEL TITULAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Nombre completo : Luis Fernando Montoya Mejia
+Cédula de ciudadanía : 8100898
+Correo electrónico : luistyle@gmail.com
+Nacionalidad : Colombiana
+Calidad : Autor y titular originario de los derechos patrimoniales y morales
+  sobre el software, en los términos del artículo 3 de la Ley 23 de 1982 y el
+  artículo 9 de la Decisión 351 de la Comunidad Andina de Naciones (CAN).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 2. IDENTIFICACIÓN DEL LICENCIATARIO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Nombre : Comunidad Campestre Las Blancas
+Tipo de licenciatario : Comunidad organizada / persona jurídica o colectivo
+  de hecho
+Departamento : Antioquia, Colombia
+
+El licenciatario es la única entidad autorizada para hacer uso del despliegue
+específico del software bajo los términos establecidos en esta licencia.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 3. DESCRIPCIÓN DEL SOFTWARE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3.1. DENOMINACIÓN
+  "Portal Comunitario Las Blancas" (en adelante, "el Software").
+
+3.2. DESCRIPCIÓN FUNCIONAL
+  Aplicación web de página única (SPA) desarrollada con tecnologías React,
+  Firebase (Firestore, Storage, Hosting) y Tailwind CSS, destinada a la gestión
+  interna de la comunidad campestre Las Blancas. Sus módulos comprenden, sin
+  limitarse a: sistema de autenticación por lote, gestión de noticias e
+  información de interés, iniciativas y votaciones comunitarias, muro de
+  propuestas, muro comunitario con galería, proyectos y fondos comunitarios,
+  directorio de servicios, directorio vecinal, mapa de etapas, guía de flora y
+  fauna del Cañón del Río Porce (con reacciones y contadores), perfil de
+  usuario, administración de usuarios, registro de actividad, y panel de
+  métricas de almacenamiento en la nube.
+
+3.3. AÑO DE CREACIÓN
+  El Software fue creado y desarrollado a partir del año 2025.
+
+3.4. NATURALEZA JURÍDICA DE LA OBRA
+  El Software es una obra del intelecto protegida como obra literaria en virtud
+  del artículo 2 de la Ley 23 de 1982 y del artículo 3 de la Decisión 351 CAN,
+  en concordancia con el artículo 1 de la Ley 1915 de 2018. La protección surge
+  desde el momento de su creación, sin necesidad de registro, depósito ni
+  ninguna otra formalidad.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 4. MARCO JURÍDICO APLICABLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Esta licencia se fundamenta y se interpreta de conformidad con las siguientes
+normas, en el orden de prelación que corresponda:
+
+  a) Constitución Política de Colombia, artículo 61 (propiedad intelectual).
+  b) Ley 23 de 1982 sobre Derechos de Autor.
+  c) Decisión 351 de 1993 de la Comunidad Andina de Naciones.
+  d) Ley 1915 de 2018, modificatoria de la Ley 23 de 1982.
+  e) Decreto 1066 de 2015 (Decreto Único Reglamentario del Sector Interior),
+     en lo pertinente a propiedad intelectual.
+  f) Ley 527 de 1999 sobre mensajes de datos y comercio electrónico.
+  g) Ley 1581 de 2012 y Decreto 1377 de 2013, sobre protección de datos
+     personales (Habeas Data).
+  h) Ley 1273 de 2009 sobre delitos informáticos.
+  i) Código Civil colombiano, en lo relativo a contratos y obligaciones.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 5. DERECHOS MORALES DEL AUTOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Conforme al artículo 30 de la Ley 23 de 1982 y al artículo 11 de la Decisión
+351 CAN, el titular conserva de forma perpetua, inalienable e irrenunciable los
+siguientes derechos morales:
+
+  a) El derecho de divulgación: decidir si el Software se da a conocer al
+     público y en qué forma.
+  b) El derecho de paternidad: exigir el reconocimiento de su calidad de autor
+     del Software en toda reproducción, distribución, comunicación pública o
+     exhibición del mismo.
+  c) El derecho de integridad: oponerse a cualquier deformación, mutilación,
+     modificación o atentado contra el Software que cause perjuicio a su honor
+     o reputación.
+  d) El derecho de modificación: introducir cambios al Software antes o después
+     de su comunicación al público.
+  e) El derecho de retiro: retirar el Software de circulación, con indemnización
+     previa de perjuicios a los titulares de derechos adquiridos de buena fe.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 6. DERECHOS PATRIMONIALES CONCEDIDOS (LICENCIA)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6.1. TIPO DE LICENCIA
+  El titular otorga al licenciatario una licencia de uso EXCLUSIVA, PERSONAL,
+  INTRANSFERIBLE y GRATUITA sobre el despliegue específico del Software para la
+  Comunidad Campestre Las Blancas.
+
+  La exclusividad recae sobre el despliegue, configuración, base de datos e
+  instancia particular del Software operada para Las Blancas. El titular
+  conserva íntegramente sus derechos sobre el código fuente, la arquitectura,
+  los componentes reutilizables y el conocimiento técnico (know-how) subyacente,
+  y podrá utilizarlos para desarrollar productos similares o derivados
+  destinados a terceros distintos del licenciatario.
+
+6.2. ALCANCE DE LOS DERECHOS CONCEDIDOS
+  La presente licencia autoriza al licenciatario a:
+
+  a) Acceder y utilizar el Software a través del dominio o URL asignado por el
+     titular para la operación del portal.
+  b) Permitir el acceso a los residentes y propietarios de la Comunidad
+     Campestre Las Blancas debidamente identificados mediante las credenciales
+     del sistema.
+  c) Gestionar el contenido del portal (noticias, eventos, votaciones, fondos,
+     directorio, etc.) conforme a las funcionalidades disponibles.
+  d) Solicitar al titular soporte técnico, corrección de errores y
+     actualizaciones, en los términos que las partes acuerden.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 7. RESTRICCIONES Y PROHIBICIONES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Queda expresamente PROHIBIDO al licenciatario y a cualquier tercero:
+
+  a) REPRODUCCIÓN: Copiar, duplicar o reproducir el código fuente del Software,
+     total o parcialmente, sin autorización escrita del titular.
+
+  b) DISTRIBUCIÓN: Ceder, sublicenciar, vender, arrendar, prestar, transferir o
+     poner a disposición de terceros el Software o cualquiera de sus
+     componentes, sin autorización escrita del titular.
+
+  c) MODIFICACIÓN NO AUTORIZADA: Realizar ingeniería inversa, descompilar,
+     desensamblar, modificar, traducir o crear obras derivadas del Software sin
+     consentimiento previo y escrito del titular.
+
+  d) USO COMERCIAL POR EL LICENCIATARIO: Explotar comercialmente el Software,
+     revenderlo o utilizarlo como base para prestar servicios a terceros
+     distintos de los miembros de la Comunidad Campestre Las Blancas.
+
+  e) SUPRESIÓN DE AVISOS: Eliminar, alterar u ocultar los avisos de derechos
+     de autor, créditos de autoría u otras indicaciones de propiedad intelectual
+     contenidas en el Software o en su interfaz.
+
+  f) USO INDEBIDO DE DATOS: Usar los datos personales de los usuarios del portal
+     para fines distintos a la gestión interna de la comunidad, en contravención
+     de la Ley 1581 de 2012.
+
+  g) ACCESO NO AUTORIZADO: Intentar acceder a áreas o funcionalidades del
+     Software para las que no se cuente con credenciales válidas, en los
+     términos de la Ley 1273 de 2009.
+
+El incumplimiento de cualquiera de estas restricciones dará lugar a las
+acciones civiles y penales que correspondan conforme a la legislación colombiana
+vigente, incluyendo las previstas en los artículos 270 a 272 del Código Penal
+colombiano (delitos contra los derechos de autor).
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 8. TITULARIDAD DEL CÓDIGO FUENTE Y RESERVA DE DERECHOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+8.1. El código fuente del Software, incluyendo todos sus módulos, componentes,
+  algoritmos, estructuras de datos, diseño de interfaz, configuraciones y
+  documentación técnica, es y permanecerá siendo de propiedad exclusiva del
+  titular.
+
+8.2. La presente licencia no constituye cesión, transferencia ni enajenación de
+  ningún derecho patrimonial sobre el Software. Solo confiere al licenciatario
+  el derecho de uso en los términos descritos en el Artículo 6.
+
+8.3. El titular se reserva expresamente todos los derechos no concedidos de
+  forma expresa en esta licencia, incluyendo, sin limitación: el derecho de
+  reproducción, distribución, transformación y comunicación pública del
+  Software; y el derecho de utilizar el código fuente, la arquitectura y los
+  componentes del Software para desarrollar productos similares para otras
+  comunidades, municipios u organizaciones.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 9. GRATUIDAD
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+La presente licencia se otorga de forma completamente gratuita. No existe ni
+existirá contraprestación económica por el uso del Software bajo los términos
+aquí establecidos.
+
+Nota: Los costos de infraestructura de terceros (Firebase/Google Cloud,
+dominio, conectividad) son responsabilidad del licenciatario o se acuerdan por
+separado, y no constituyen pago al titular por concepto de licencia de software.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 10. ACTUALIZACIONES Y MANTENIMIENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+10.1. El titular podrá, a su entera discreción, publicar actualizaciones,
+  mejoras o nuevas versiones del Software. Dichas actualizaciones quedan
+  automáticamente cubiertas por la presente licencia.
+
+10.2. El titular no asume obligación contractual de proveer soporte técnico,
+  mantenimiento correctivo ni actualizaciones periódicas, salvo que exista
+  acuerdo escrito separado entre las partes.
+
+10.3. Las modificaciones al Software realizadas por el titular para mejorar,
+  adaptar o expandir sus funcionalidades continúan siendo de su propiedad
+  exclusiva.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 11. TRATAMIENTO DE DATOS PERSONALES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+De conformidad con la Ley Estatutaria 1581 de 2012 y el Decreto Reglamentario
+1377 de 2013:
+
+11.1. El Software almacena datos personales de los residentes de la comunidad
+  (número de lote, nombre de finca, avatar, registro de actividad) en bases de
+  datos alojadas en Firebase/Google Cloud, con servidores ubicados conforme a
+  los términos de servicio de Google LLC.
+
+11.2. El licenciatario, en su calidad de responsable del tratamiento ante los
+  titulares de los datos, deberá:
+
+  a) Obtener autorización previa, expresa e informada de los residentes para
+     el tratamiento de sus datos personales.
+  b) Implementar medidas de seguridad razonables para proteger la información.
+  c) Atender las solicitudes de acceso, corrección, supresión y revocación
+     (derechos ARCO) de los titulares de los datos.
+  d) No ceder ni transferir los datos personales a terceros no autorizados.
+
+11.3. El titular del Software, en su calidad de desarrollador, no realiza
+  tratamiento autónomo de los datos personales de los usuarios finales del
+  portal, y no actúa como responsable del tratamiento frente a dichos usuarios.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 12. LIMITACIÓN DE RESPONSABILIDAD Y GARANTÍAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+12.1. EL SOFTWARE SE PROVEE "TAL CUAL" (AS IS). El titular no otorga garantías
+  expresas ni implícitas respecto a su adecuación para un propósito particular,
+  ausencia de errores, disponibilidad continua o compatibilidad con sistemas
+  de terceros.
+
+12.2. El titular no será responsable por daños directos, indirectos, inciden-
+  tales, especiales o consecuentes derivados del uso o la imposibilidad de uso
+  del Software, incluyendo pérdida de datos, interrupción del servicio o daños
+  a la reputación del licenciatario.
+
+12.3. La responsabilidad máxima del titular, en cualquier caso, quedará
+  limitada al valor efectivamente pagado por el licenciatario en concepto de
+  licencia. Dado que la presente licencia es gratuita, dicha responsabilidad
+  máxima es de cero pesos colombianos (COP $0).
+
+12.4. El licenciatario asume la responsabilidad exclusiva por el uso que sus
+  administradores y residentes hagan del Software, así como por el contenido
+  publicado en el portal.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 13. VIGENCIA Y TERMINACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+13.1. VIGENCIA
+  La presente licencia entra en vigor desde la fecha de primer despliegue del
+  Software y tendrá vigencia indefinida, salvo terminación conforme a los
+  numerales siguientes.
+
+13.2. TERMINACIÓN POR INCUMPLIMIENTO
+  El titular podrá terminar esta licencia de forma inmediata y unilateral,
+  mediante comunicación escrita al licenciatario, en caso de:
+
+  a) Incumplimiento de cualquiera de las restricciones del Artículo 7.
+  b) Uso del Software para actividades ilegales o contrarias al orden público.
+  c) Cesión o sublicencia no autorizados del Software a terceros.
+
+13.3. TERMINACIÓN VOLUNTARIA
+  Cualquiera de las partes podrá terminar la presente licencia en cualquier
+  momento, con un preaviso mínimo de treinta (30) días calendario, mediante
+  comunicación escrita dirigida a la otra parte.
+
+13.4. EFECTOS DE LA TERMINACIÓN
+  Ante la terminación de la licencia, por cualquier causa, el licenciatario
+  deberá: (i) cesar inmediatamente el uso del Software; (ii) eliminar o
+  devolver al titular cualquier copia del código fuente que pudiera obrar en
+  su poder; (iii) exportar y conservar sus datos propios conforme a los
+  procedimientos que el titular indique. El titular no tendrá obligación de
+  mantener el servicio activo tras la terminación.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 14. CRÉDITOS DE TERCEROS Y LICENCIAS ABIERTAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+El Software incorpora componentes de código abierto sujetos a sus propias
+licencias, entre ellos:
+
+  - React (MIT License) — Meta Platforms, Inc.
+  - Vite (MIT License) — Evan You y colaboradores
+  - Tailwind CSS (MIT License) — Tailwind Labs, Inc.
+  - Firebase JavaScript SDK (Apache 2.0) — Google LLC
+  - Lucide React (ISC License) — Lucide Contributors
+
+El uso de estos componentes se realiza conforme a sus respectivos términos.
+Sus licencias no amplían ni modifican los derechos conferidos por la presente
+licencia sobre el Software en su conjunto.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 15. LEY APLICABLE Y JURISDICCIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+15.1. La presente licencia se rige en su totalidad por las leyes de la
+  República de Colombia.
+
+15.2. Para la resolución de cualquier controversia derivada de la interpretación,
+  ejecución o terminación de esta licencia, las partes acuerdan someterse,
+  en primer lugar, a un mecanismo de arreglo directo durante treinta (30) días
+  calendario. De no llegarse a un acuerdo, se acudirá a los jueces competentes
+  de la República de Colombia, renunciando a cualquier otro fuero que pudiera
+  corresponderles.
+
+15.3. Sin perjuicio de lo anterior, el titular podrá acudir, en cualquier
+  momento, a la Dirección Nacional de Derecho de Autor (DNDA), adscrita al
+  Ministerio del Interior, para la protección de sus derechos.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ARTÍCULO 16. DISPOSICIONES FINALES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+16.1. INTEGRIDAD: Esta licencia constituye el acuerdo completo entre las partes
+  respecto al uso del Software y reemplaza cualquier entendimiento previo, oral
+  o escrito, sobre el mismo objeto.
+
+16.2. MODIFICACIONES: El titular podrá actualizar los términos de esta licencia
+  mediante notificación escrita al licenciatario con un mínimo de quince (15)
+  días de antelación. El uso continuado del Software tras dicho período implica
+  la aceptación de los nuevos términos.
+
+16.3. NULIDAD PARCIAL: Si alguna disposición de esta licencia fuera declarada
+  nula, ineficaz o inaplicable por autoridad competente, las demás disposiciones
+  continuarán vigentes en su integridad.
+
+16.4. NO RENUNCIA: La omisión del titular en exigir el cumplimiento de cualquier
+  disposición de esta licencia no constituirá renuncia a su derecho a exigirlo
+  en el futuro.
+
+16.5. REGISTRO ANTE LA DNDA: El titular se reserva el derecho de registrar el
+  Software ante la Dirección Nacional de Derecho de Autor en cualquier momento,
+  lo cual no afectará la protección ya existente en virtud del artículo 9 de
+  la Decisión 351 CAN.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Para consultas o autorizaciones sobre el uso de este Software, contactar a:
+luistyle@gmail.com
+
+════════════════════════════════════════════════════════════════════════════════
+© 2025 [Luis Fernando Montoya Mejia] — Todos los derechos reservados.
+Protegido por la Ley 23 de 1982, la Decisión 351 CAN y la Ley 1915 de 2018
+de la República de Colombia.
+════════════════════════════════════════════════════════════════════════════════
